@@ -1,21 +1,21 @@
 targetScope = 'resourceGroup'
 
-param location string
+param parLocation string
 
-param hubvnetrg string
+param parHubVnetRg string
 
-param hubvnetname string
+param parHubVnetName string
 
-param spoke1vnetname string
+param parSpoke1VnetName string
 
-resource hubvnet 'Microsoft.Network/virtualNetworks@2021-08-01' existing = {
-  name: hubvnetname
-  scope: resourceGroup(hubvnetrg)
+resource hubVnet 'Microsoft.Network/virtualNetworks@2021-08-01' existing = {
+  name: parHubVnetName
+  scope: resourceGroup(parHubVnetRg)
 }
 
-resource spoke1vnet 'Microsoft.Network/virtualNetworks@2021-08-01' = {
-  name: spoke1vnetname
-  location: location
+resource spoke1Vnet 'Microsoft.Network/virtualNetworks@2021-08-01' = {
+  name: parSpoke1VnetName
+  location: parLocation
   tags: {}
   properties: {
     addressSpace: {
@@ -26,15 +26,15 @@ resource spoke1vnet 'Microsoft.Network/virtualNetworks@2021-08-01' = {
   }
 }
 
-resource spoke1tohubpeer 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2021-08-01' = {
-  parent: spoke1vnet
+resource spoke1ToHubPeer 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2021-08-01' = {
+  parent: spoke1Vnet
   name: 'spoke1tohub'
   properties: {
     allowVirtualNetworkAccess: true
     allowForwardedTraffic: true
     allowGatewayTransit: true
     remoteVirtualNetwork: {
-      id: hubvnet.id
+      id: hubVnet.id
     }
   }
 }

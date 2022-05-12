@@ -1,47 +1,47 @@
 targetScope = 'subscription'
 
-param location string
+param parLocation string
 
 @allowed([
   'POC'
   'ADS'
   'MVP'
 ])
-param deploymenttype string 
+param parDeploymentType string 
 
-var varHubVnetRgName = '${deploymenttype}-hub-rg'
-var varSpoke1VnetRgName = '${deploymenttype}-spoke1-rg'
-var varHubVnetName = '${deploymenttype}-hub-vnet'
-var varSpoke1VnetName = '${deploymenttype}-spoke1-vnet'
+var varHubVnetRgName = '${parDeploymentType}-hub-rg'
+var varSpoke1VnetRgName = '${parDeploymentType}-spoke1-rg'
+var varHubVnetName = '${parDeploymentType}-hub-vnet'
+var varSpoke1VnetName = '${parDeploymentType}-spoke1-vnet'
 
 resource hubvnetrg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: varHubVnetRgName
-  location: location
+  location: parLocation
 }
 
 resource spoke1vnetrg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: varSpoke1VnetRgName
-  location: location
+  location: parLocation
 }
 
 module hubvnetdeploy 'hubvnet.bicep' = {
   scope: resourceGroup(hubvnetrg.name)
   name: 'hubvnetdeploy'
-  params: {
-    spoke1vnetname: varSpoke1VnetName
-    spoke1vnetrg: varSpoke1VnetRgName
-    location: location
-    hubvnetname: varHubVnetName
+  params:{
+    parLocation: parLocation
+    parSpoke1VnetName: varSpoke1VnetName
+    parSpoke1VnetRg: varSpoke1VnetRgName
+    parHubVnetName: varHubVnetName
   }
 }
 
 module spoke1vnetdeploy 'spoke1vnet.bicep' = {
   scope: resourceGroup(spoke1vnetrg.name)
   name: 'spoke1vnetdeploy'
-  params: {
-    hubvnetname: varHubVnetName
-    hubvnetrg: varHubVnetRgName
-    location: location
-    spoke1vnetname: varSpoke1VnetName
-  }
+params:{
+  parLocation: parLocation
+  parHubVnetRg: varHubVnetRgName
+  parSpoke1VnetName: varSpoke1VnetName
+  parHubVnetName: varHubVnetName
+}
 }
