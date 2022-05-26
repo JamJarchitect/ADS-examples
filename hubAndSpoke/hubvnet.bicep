@@ -33,3 +33,43 @@ resource gatewaySubnet 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' ex
   name: 'GatewaySubnet'
   parent: hubvnet
 }
+
+resource hubVngPip 'Microsoft.Network/publicIPAddresses@2021-08-01' = {
+  name: varVngPipName
+  location: parLocation
+  properties: {
+    publicIPAllocationMethod: 'Static'
+  }
+  sku: {
+    name: 'Standard'
+  }
+}
+
+resource hubvng 'Microsoft.Network/virtualNetworkGateways@2021-08-01' = {
+  name: '${parHubVnetName}vng'
+  location: parLocation
+  properties: {
+    gatewayType: 'Vpn'
+    vpnType: 'RouteBased'
+    sku: {
+      name: 'VpnGw1'
+      tier: 'VpnGw1'
+    }
+    vpnGatewayGeneration: 'Generation1'
+    activeActive: false
+    ipConfigurations: [
+      {
+        name: 'default'
+        properties: {
+          publicIPAddress: {
+            id: hubVngPip.id
+          }
+          privateIPAllocationMethod: 'Dynamic'
+          subnet: {
+            id: gatewaySubnet.id
+          }
+        }
+      }
+    ]
+  }
+}
